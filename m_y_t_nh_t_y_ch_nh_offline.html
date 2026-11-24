@@ -1,0 +1,2427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#9c4dcc" id="metaThemeColor" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Máy tính Pro" />
+  <title>Máy Tính Pro V2 - Tùy chỉnh & Offline</title>
+  <style>
+    :root {
+      --header-bg: #9c4dcc;
+      --header-text: #ffffff;
+      --header-title-color: #ffffff;
+      --display-bg: #ffffff;
+      --display-text: #111827;
+      --display-subtext: #6b7280;
+      --accent-color: #8e24aa;
+      --keypad-bg: #f3f4f6;
+      --num-btn-bg: #ffffff;
+      --num-btn-text: #111827;
+      --op-btn-bg: #ffffff;
+      --op-btn-text: #8e24aa;
+      --eq-btn-bg: #7b1fa2;
+      --eq-btn-text: #ffffff;
+
+      --btn-scale-h: 56px;
+      --btn-gap: 8px;
+      --btn-radius: 12px;
+      --btn-font-size: 24px;
+      --display-font-size: 46px;
+      --sci-font-size: 14px;
+
+      --bg-opacity: 1;
+      --bg-overlay-alpha: 0;
+      --bg-scale: 100%;
+      --bg-pos-x: 50%;
+      --bg-pos-y: 50%;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #1f2937;
+      color: var(--display-text);
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Full-bleed iPhone shell, centered compact phone frame on large desktop */
+    #appShell {
+      width: 100%;
+      height: 100dvh;
+      background-color: var(--keypad-bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      transition: background-color 0.2s ease;
+    }
+
+    @media (min-width: 520px) {
+      #appShell {
+        max-width: 440px;
+        height: 95dvh;
+        max-height: 900px;
+        border-radius: 28px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+      }
+    }
+
+    /* Header Bar with iPhone Notch / Dynamic Island Safe Area */
+    #topHeader {
+      background-color: var(--header-bg);
+      color: var(--header-text);
+      min-height: calc(50px + env(safe-area-inset-top, 0px));
+      padding: calc(6px + env(safe-area-inset-top, 0px)) 10px 6px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+      transition: background-color 0.2s ease, color 0.2s ease;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .hdr-btn {
+      background: transparent;
+      border: none;
+      color: inherit;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background-color 0.15s, transform 0.1s;
+    }
+
+    .hdr-btn:hover {
+      background-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .hdr-btn:active {
+      transform: scale(0.9);
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .hdr-btn.is-active {
+      background-color: rgba(255, 255, 255, 0.22);
+    }
+
+    #titleDisplayGroup {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--header-title-color);
+      min-width: 0;
+      padding: 4px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    #titleDisplayGroup:active {
+      background-color: rgba(255, 255, 255, 0.14);
+    }
+
+    #headerTitleIcon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    #headerTitleText {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #offlineBadge {
+      display: none;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background-color: rgba(239, 68, 68, 0.9);
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    #offlineBadge.visible {
+      display: inline-block;
+    }
+
+    /* Display Frame */
+    #displayWrapper {
+      background-color: var(--display-bg);
+      position: relative;
+      flex: 1;
+      min-height: 130px;
+      margin: 8px 8px 4px 8px;
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      transition: background-color 0.2s ease;
+    }
+
+    #displayBgImage {
+      position: absolute;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: var(--bg-pos-x) var(--bg-pos-y);
+      background-size: var(--bg-scale);
+      opacity: var(--bg-opacity);
+      pointer-events: none;
+      z-index: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    #displayBgOverlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, var(--bg-overlay-alpha));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #displayContent {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      padding: 10px 16px 4px 16px;
+      overflow: hidden;
+    }
+
+    #degRadIndicator {
+      display: none;
+      align-self: flex-start;
+      margin-bottom: auto;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background-color: rgba(128, 128, 128, 0.16);
+      color: var(--display-subtext);
+    }
+
+    #degRadIndicator.visible {
+      display: inline-block;
+    }
+
+    #expressionText {
+      color: var(--display-subtext);
+      font-size: calc(var(--display-font-size) * 0.42);
+      min-height: 1.4em;
+      width: 100%;
+      text-align: right;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+      user-select: text;
+    }
+    #expressionText::-webkit-scrollbar { display: none; }
+
+    #resultText {
+      color: var(--display-text);
+      font-size: var(--display-font-size);
+      font-weight: 300;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+      width: 100%;
+      text-align: right;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+      user-select: text;
+      transition: font-size 0.12s ease, color 0.2s ease;
+    }
+    #resultText::-webkit-scrollbar { display: none; }
+
+    /* Display Bottom Toolbar */
+    #displayToolbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 10px 8px 10px;
+      color: var(--accent-color);
+    }
+
+    .toolbar-btn {
+      background: transparent;
+      border: none;
+      color: inherit;
+      padding: 6px 12px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.1s, background-color 0.15s;
+    }
+    .toolbar-btn:active {
+      transform: scale(0.9);
+      background-color: rgba(128, 128, 128, 0.15);
+    }
+
+    /* Expandable Scientific Drawer */
+    #scientificPanel {
+      background-color: var(--keypad-bg);
+      padding: 0 8px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s ease;
+      flex-shrink: 0;
+    }
+    #scientificPanel.open {
+      max-height: 170px;
+      padding: 4px 8px 4px 8px;
+    }
+
+    .sci-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .sci-btn {
+      background-color: var(--op-btn-bg);
+      color: var(--op-btn-text);
+      border: 1px solid rgba(128, 128, 128, 0.12);
+      font-size: var(--sci-font-size);
+      font-weight: 500;
+      height: 34px;
+      border-radius: calc(var(--btn-radius) * 0.8);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.08s, filter 0.12s;
+    }
+    .sci-btn:active {
+      transform: scale(0.93);
+      filter: brightness(0.92);
+    }
+
+    /* Main 4x5 Keypad Area */
+    #keypadArea {
+      background-color: var(--keypad-bg);
+      padding: 4px 8px 10px 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--btn-gap);
+      flex-shrink: 0;
+      transition: background-color 0.2s ease;
+    }
+
+    .calc-btn {
+      height: var(--btn-scale-h);
+      border-radius: var(--btn-radius);
+      font-size: var(--btn-font-size);
+      font-weight: 400;
+      border: 1px solid rgba(128, 128, 128, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+      transition: transform 0.08s ease, filter 0.12s ease, background-color 0.2s, color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .calc-btn:active {
+      transform: scale(0.94);
+      filter: brightness(0.92);
+    }
+
+    .btn-num {
+      background-color: var(--num-btn-bg);
+      color: var(--num-btn-text);
+    }
+
+    .btn-op {
+      background-color: var(--op-btn-bg);
+      color: var(--op-btn-text);
+      font-weight: 500;
+    }
+
+    .btn-eq {
+      background-color: var(--eq-btn-bg);
+      color: var(--eq-btn-text);
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(123, 31, 162, 0.3);
+    }
+
+    /* Toast Notification */
+    #toastMsg {
+      pointer-events: none;
+      position: fixed;
+      bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(17, 24, 39, 0.94);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 999px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 60;
+      white-space: nowrap;
+    }
+    #toastMsg.show {
+      opacity: 1;
+    }
+
+    /* Modals & Drawers */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.48);
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal-panel {
+      background-color: #ffffff;
+      color: #1f2937;
+      width: 100%;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      animation: sheetUp 0.2s ease-out;
+    }
+
+    @keyframes sheetUp {
+      from { transform: translateY(24px); opacity: 0.75; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      background-color: #f9fafb;
+      flex-shrink: 0;
+    }
+
+    .modal-head-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip-btn {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background-color: #ffffff;
+      color: #374151;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .chip-btn:active { transform: scale(0.96); }
+    .chip-btn.danger {
+      color: #dc2626;
+      background-color: #fef2f2;
+      border-color: #fecaca;
+    }
+    .chip-btn.primary {
+      color: #ffffff;
+      background-color: #7b1fa2;
+      border-color: #7b1fa2;
+    }
+
+    .settings-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid #e5e7eb;
+      background-color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .settings-tab {
+      padding: 10px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      touch-action: manipulation;
+      white-space: nowrap;
+    }
+
+    .settings-tab.active {
+      color: #7b1fa2;
+      border-bottom-color: #7b1fa2;
+    }
+
+    .modal-scroll-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px 16px 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tab-content {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .tab-content.hidden {
+      display: none;
+    }
+
+    .setting-card {
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .group-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #6b7280;
+    }
+
+    .row-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: #1f2937;
+    }
+
+    .col-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      background-color: #ffffff;
+      color: #111827;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus {
+      border-color: #7b1fa2;
+    }
+
+    .toggle-wrap {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-track {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #d1d5db;
+      border-radius: 999px;
+      transition: background-color 0.2s;
+    }
+    .toggle-track::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
+    }
+    .toggle-wrap input:checked + .toggle-track {
+      background-color: #7b1fa2;
+    }
+    .toggle-wrap input:checked + .toggle-track::before {
+      transform: translateX(20px);
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .preset-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 4px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      background-color: #ffffff;
+      font-size: 11px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .preset-btn:active { border-color: #8e24aa; }
+
+    .preset-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .icon-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+
+    .icon-choice-btn {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background-color: #ffffff;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .icon-choice-btn.selected {
+      border: 2px solid #7b1fa2;
+      background-color: #f3e8ff;
+      color: #7b1fa2;
+    }
+
+    .hist-item-card {
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 11px 12px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .hist-item-card:active {
+      background-color: #f3e8ff;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-color);
+      cursor: pointer;
+    }
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch {
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="appShell">
+
+    <!-- Top Header Bar -->
+    <header id="topHeader">
+      <div class="header-left">
+        <button id="openSettingsMenuBtn" class="hdr-btn" title="Tùy chỉnh giao diện & cài đặt">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <div id="titleDisplayGroup" title="Chạm để đổi tên hoặc biểu tượng">
+          <span id="headerTitleIcon"></span>
+          <span id="headerTitleText">Máy tính Pro</span>
+        </div>
+
+        <span id="offlineBadge">Offline</span>
+      </div>
+
+      <div class="header-right">
+        <!-- Quick Light / Dark Toggle -->
+        <button id="quickThemeToggleBtn" class="hdr-btn" title="Chuyển nhanh Sáng / Tối">
+          <svg id="quickThemeIcon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
+
+        <!-- Quick Vietnamese Voice Readout Toggle -->
+        <button id="quickVoiceToggleBtn" class="hdr-btn" title="Bật/Tắt đọc giọng nói tiếng Việt">
+          <svg id="quickVoiceIcon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        </button>
+
+        <!-- History Button -->
+        <button id="openHistoryBtn" class="hdr-btn" title="Lịch sử tính toán">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        <!-- Quick Menu / 3 Dots -->
+        <button id="openQuickMoreBtn" class="hdr-btn" title="Giọng nói, Âm thanh & Tải về">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="5" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="12" cy="19" r="2" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Display Frame -->
+    <section id="displayWrapper">
+      <div id="displayBgImage"></div>
+      <div id="displayBgOverlay"></div>
+
+      <div id="displayContent">
+        <div id="degRadIndicator">DEG</div>
+        <div id="expressionText"></div>
+        <div id="resultText">0</div>
+      </div>
+
+      <div id="displayToolbar">
+        <button id="displayDotsBtn" class="toolbar-btn" title="Đổi hình nền khung tính">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <circle cx="5" cy="12" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="19" cy="12" r="2" />
+          </svg>
+        </button>
+
+        <button id="toggleSciBtn" class="toolbar-btn" title="Mở rộng phép tính khoa học">
+          <svg id="sciChevronIcon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition: transform 0.25s;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+
+        <button id="backspaceBtn" class="toolbar-btn" title="Xóa lùi">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Expandable Scientific Panel -->
+    <section id="scientificPanel">
+      <div class="sci-grid">
+        <button class="sci-btn" id="degRadBtn" data-action="degRad">DEG</button>
+        <button class="sci-btn" data-sci="sin(">sin</button>
+        <button class="sci-btn" data-sci="cos(">cos</button>
+        <button class="sci-btn" data-sci="tan(">tan</button>
+        <button class="sci-btn" data-sci="^">xʸ</button>
+
+        <button class="sci-btn" data-sci="ln(">ln</button>
+        <button class="sci-btn" data-sci="log(">log</button>
+        <button class="sci-btn" data-sci="√(">√</button>
+        <button class="sci-btn" data-sci="π">π</button>
+        <button class="sci-btn" data-sci="e">e</button>
+
+        <button class="sci-btn" data-sci="!">x!</button>
+        <button class="sci-btn" data-sci="1/(">1/x</button>
+        <button class="sci-btn" data-sci="abs(">|x|</button>
+        <button class="sci-btn" data-sci="asin(">sin⁻¹</button>
+        <button class="sci-btn" data-sci="acos(">cos⁻¹</button>
+      </div>
+    </section>
+
+    <!-- Main 4x5 Calculator Keypad -->
+    <main id="keypadArea">
+      <button class="calc-btn btn-op" data-key="C">C</button>
+      <button class="calc-btn btn-op" data-key="()">()</button>
+      <button class="calc-btn btn-op" data-key="%">%</button>
+      <button class="calc-btn btn-op" data-key="÷">÷</button>
+
+      <button class="calc-btn btn-num" data-key="7">7</button>
+      <button class="calc-btn btn-num" data-key="8">8</button>
+      <button class="calc-btn btn-num" data-key="9">9</button>
+      <button class="calc-btn btn-op" data-key="×">×</button>
+
+      <button class="calc-btn btn-num" data-key="4">4</button>
+      <button class="calc-btn btn-num" data-key="5">5</button>
+      <button class="calc-btn btn-num" data-key="6">6</button>
+      <button class="calc-btn btn-op" data-key="−">−</button>
+
+      <button class="calc-btn btn-num" data-key="1">1</button>
+      <button class="calc-btn btn-num" data-key="2">2</button>
+      <button class="calc-btn btn-num" data-key="3">3</button>
+      <button class="calc-btn btn-op" data-key="+">+</button>
+
+      <button class="calc-btn btn-num" data-key="0">0</button>
+      <button class="calc-btn btn-num" data-key="00">00</button>
+      <button class="calc-btn btn-num" data-key=",">,</button>
+      <button class="calc-btn btn-eq" data-key="=">=</button>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toastMsg">Đã lưu cài đặt</div>
+
+    <!-- HISTORY MODAL -->
+    <div id="historyModal" class="modal-overlay hidden">
+      <div class="modal-panel" style="height: 76%;">
+        <div class="modal-head">
+          <div class="modal-head-title">
+            <svg width="18" height="18" fill="none" stroke="#8e24aa" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Lịch sử tính toán</span>
+          </div>
+          <div class="modal-head-actions">
+            <button id="clearHistoryBtn" class="chip-btn danger">Xóa tất cả</button>
+            <button id="closeHistoryBtn" class="chip-btn">Đóng</button>
+          </div>
+        </div>
+        <div id="historyList" class="modal-scroll-body"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="modal-overlay hidden">
+      <div class="modal-panel" style="height: 88%;">
+        <div class="modal-head">
+          <div class="modal-head-title">Tùy chỉnh Máy tính Pro</div>
+          <div class="modal-head-actions">
+            <button id="resetAllBtn" class="chip-btn">Mặc định</button>
+            <button id="closeSettingsBtn" class="chip-btn primary">Xong</button>
+          </div>
+        </div>
+
+        <div class="settings-tabs">
+          <button class="settings-tab active" data-tab="tabColorsTitle">Màu & Tiêu đề</button>
+          <button class="settings-tab" data-tab="tabWallpaper">Hình nền</button>
+          <button class="settings-tab" data-tab="tabSizes">Kích thước</button>
+          <button class="settings-tab" data-tab="tabVoiceSound">Giọng & Offline</button>
+        </div>
+
+        <div class="modal-scroll-body">
+
+          <!-- TAB 1: MÀU SẮC, SÁNG/TỐI & TIÊU ĐỀ -->
+          <div id="tabColorsTitle" class="tab-content">
+            <div class="setting-card">
+              <div class="group-label">Đồng bộ giao diện Sáng / Tối</div>
+              <div class="row-between">
+                <div>
+                  <div style="font-weight: 600;">Tự động đồng bộ Sáng / Tối</div>
+                  <div style="font-size: 11px; color: #6b7280;">Tự chuyển màu nền tối dịu mắt khi máy đổi chế độ</div>
+                </div>
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="autoThemeSyncToggle" checked />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+              <div class="col-stack" id="syncModeContainer">
+                <label style="font-size: 12px; color: #4b5563;">Chế độ đồng bộ tự động</label>
+                <select id="themeSyncModeSelect">
+                  <option value="system">Theo giao diện thiết bị (iPhone / Windows)</option>
+                  <option value="schedule">Theo khung giờ (Tối từ 18:00 đến 06:00)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <div class="group-label">Tùy biến Tiêu đề & Biểu tượng</div>
+              <div class="col-stack">
+                <label style="font-size: 12px; color: #4b5563;">Chữ tiêu đề (để trống nếu chỉ hiện biểu tượng)</label>
+                <input type="text" id="titleTextInput" placeholder="Ví dụ: Máy tính Pro, Sổ tính tiền..." maxlength="26" />
+              </div>
+              <div class="row-between">
+                <span>Màu chữ & biểu tượng tiêu đề</span>
+                <input type="color" id="titleColorInput" value="#ffffff" />
+              </div>
+              <div class="col-stack">
+                <span style="font-size: 12px; color: #4b5563;">Chọn biểu tượng đi kèm</span>
+                <div class="icon-picker-grid" id="titleIconsGrid"></div>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <div class="group-label">Bộ màu có sẵn</div>
+              <div class="preset-grid">
+                <button class="preset-btn" data-preset="purple">
+                  <span class="preset-dot" style="background: linear-gradient(135deg, #9c4dcc 50%, #f3f4f6 50%);"></span>
+                  <span>Tím gốc</span>
+                </button>
+                <button class="preset-btn" data-preset="ocean">
+                  <span class="preset-dot" style="background: linear-gradient(135deg, #0284c7 50%, #e0f2fe 50%);"></span>
+                  <span>Xanh biển</span>
+                </button>
+                <button class="preset-btn" data-preset="sakura">
+                  <span class="preset-dot" style="background: linear-gradient(135deg, #ec4899 50%, #fce7f3 50%);"></span>
+                  <span>Hồng phấn</span>
+                </button>
+                <button class="preset-btn" data-preset="dark">
+                  <span class="preset-dot" style="background: linear-gradient(135deg, #1f2937 50%, #111827 50%);"></span>
+                  <span>Tối AMOLED</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <div class="group-label">Tùy chỉnh màu từng phần</div>
+              <div class="row-between">
+                <span>Thanh tiêu đề trên (Nền / Chữ)</span>
+                <div style="display:flex; gap:8px;">
+                  <input type="color" data-var="--header-bg" value="#9c4dcc" />
+                  <input type="color" data-var="--header-text" value="#ffffff" />
+                </div>
+              </div>
+              <div class="row-between">
+                <span>Khung hiển thị số (Nền / Số)</span>
+                <div style="display:flex; gap:8px;">
+                  <input type="color" data-var="--display-bg" value="#ffffff" />
+                  <input type="color" data-var="--display-text" value="#111827" />
+                </div>
+              </div>
+              <div class="row-between">
+                <span>Nền khu vực bàn phím</span>
+                <input type="color" data-var="--keypad-bg" value="#f3f4f6" />
+              </div>
+              <div class="row-between">
+                <span>Phím số 0–9, 00, dấu phẩy (Nền / Chữ)</span>
+                <div style="display:flex; gap:8px;">
+                  <input type="color" data-var="--num-btn-bg" value="#ffffff" />
+                  <input type="color" data-var="--num-btn-text" value="#111827" />
+                </div>
+              </div>
+              <div class="row-between">
+                <span>Phím phép tính C, (), %, ÷, ×, −, +</span>
+                <div style="display:flex; gap:8px;">
+                  <input type="color" data-var="--op-btn-bg" value="#ffffff" />
+                  <input type="color" data-var="--op-btn-text" value="#8e24aa" />
+                </div>
+              </div>
+              <div class="row-between">
+                <span>Nút dấu bằng "=" (Nền / Chữ)</span>
+                <div style="display:flex; gap:8px;">
+                  <input type="color" data-var="--eq-btn-bg" value="#7b1fa2" />
+                  <input type="color" data-var="--eq-btn-text" value="#ffffff" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: HÌNH NỀN KHUNG TÍNH TOÁN -->
+          <div id="tabWallpaper" class="tab-content hidden">
+            <div class="setting-card" style="background-color:#faf5ff; border-color:#e9d5ff; text-align:center;">
+              <p style="font-size:12px; color:#4b5563;">Ảnh chọn từ thư viện được tự động nén nhẹ tối ưu bộ nhớ iPhone để mở nhanh 100% khi không có mạng.</p>
+              <div style="display:flex; gap:8px; justify-content:center;">
+                <label class="chip-btn primary" style="padding:9px 14px; display:inline-flex; align-items:center; gap:6px;">
+                  <span>🖼 Chọn ảnh từ bộ sưu tập</span>
+                  <input type="file" id="bgImageInput" accept="image/*" style="display:none;" />
+                </label>
+                <button id="removeBgImageBtn" class="chip-btn danger" style="padding:9px 14px;">Xóa ảnh</button>
+              </div>
+            </div>
+
+            <div class="setting-card">
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Độ đậm nhạt ảnh (Độ rõ ảnh)</span>
+                  <span id="valBgOpacity">100%</span>
+                </div>
+                <input type="range" id="rangeBgOpacity" min="10" max="100" value="100" />
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Lớp phủ tối (Giúp dễ nhìn số trắng)</span>
+                  <span id="valBgOverlay">0%</span>
+                </div>
+                <input type="range" id="rangeBgOverlay" min="0" max="80" value="0" />
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Phóng to / Thu nhỏ ảnh</span>
+                  <span id="valBgScale">100%</span>
+                </div>
+                <input type="range" id="rangeBgScale" min="40" max="250" value="100" />
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="col-stack">
+                  <div class="slider-label-row">
+                    <span>Vị trí ngang</span>
+                    <span id="valBgPosX">50%</span>
+                  </div>
+                  <input type="range" id="rangeBgPosX" min="0" max="100" value="50" />
+                </div>
+                <div class="col-stack">
+                  <div class="slider-label-row">
+                    <span>Vị trí dọc</span>
+                    <span id="valBgPosY">50%</span>
+                  </div>
+                  <input type="range" id="rangeBgPosY" min="0" max="100" value="50" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: KÍCH THƯỚC PHÍM & SỐ -->
+          <div id="tabSizes" class="tab-content hidden">
+            <div class="setting-card">
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Chiều cao phím bấm</span>
+                  <span id="valBtnHeight">56px</span>
+                </div>
+                <input type="range" id="rangeBtnHeight" min="42" max="82" value="56" />
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Khoảng cách giữa các phím</span>
+                  <span id="valBtnGap">8px</span>
+                </div>
+                <input type="range" id="rangeBtnGap" min="2" max="16" value="8" />
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Bo góc phím bấm</span>
+                  <span id="valBtnRadius">12px</span>
+                </div>
+                <input type="range" id="rangeBtnRadius" min="0" max="32" value="12" />
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Cỡ chữ trên phím bấm</span>
+                  <span id="valBtnFontSize">24px</span>
+                </div>
+                <input type="range" id="rangeBtnFontSize" min="16" max="36" value="24" />
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Cỡ số trên màn hình kết quả</span>
+                  <span id="valDisplayFontSize">46px</span>
+                </div>
+                <input type="range" id="rangeDisplayFontSize" min="28" max="72" value="46" />
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: GIỌNG NÓI, ÂM THANH & OFFLINE IPHONE -->
+          <div id="tabVoiceSound" class="tab-content hidden">
+            <div class="setting-card">
+              <div class="group-label">Đọc giọng nói tiếng Việt</div>
+              <div class="row-between">
+                <div>
+                  <div style="font-weight: 600;">Bật đọc giọng nói</div>
+                  <div style="font-size: 11px; color: #6b7280;">Tự động đọc số & kết quả bằng tiếng Việt</div>
+                </div>
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="voiceEnabledToggle" checked />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="col-stack">
+                <label style="font-size: 12px; color: #4b5563;">Chế độ đọc</label>
+                <select id="voiceModeSelect">
+                  <option value="result">Chỉ đọc kết quả khi bấm "="</option>
+                  <option value="all">Đọc cả phím bấm & kết quả khi bấm "="</option>
+                </select>
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Tốc độ đọc</span>
+                  <span id="valVoiceRate">1.0x</span>
+                </div>
+                <input type="range" id="rangeVoiceRate" min="70" max="150" value="100" />
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Cao độ giọng</span>
+                  <span id="valVoicePitch">1.0</span>
+                </div>
+                <input type="range" id="rangeVoicePitch" min="70" max="140" value="100" />
+              </div>
+
+              <button id="testVoiceBtn" class="chip-btn primary" style="width:100%; padding:10px;">
+                🔊 Nghe thử giọng đọc tiếng Việt
+              </button>
+            </div>
+
+            <div class="setting-card">
+              <div class="group-label">Âm thanh hiệu ứng bấm phím</div>
+              <div class="row-between">
+                <div>
+                  <div style="font-weight: 600;">Âm thanh khi bấm phím</div>
+                  <div style="font-size: 11px; color: #6b7280;">Tạo âm thanh nội bộ 100% không cần mạng</div>
+                </div>
+                <label class="toggle-wrap">
+                  <input type="checkbox" id="soundToggle" checked />
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="col-stack">
+                <label style="font-size: 12px; color: #4b5563;">Kiểu âm thanh phím</label>
+                <select id="soundTypeSelect">
+                  <option value="pop">Bong bóng nhẹ (Soft Pop)</option>
+                  <option value="mech">Bàn phím cơ (Mechanical Click)</option>
+                  <option value="beep">Điện tử cổ điển (Digital Beep)</option>
+                  <option value="marimba">Đàn gỗ êm dịu (Marimba Note)</option>
+                </select>
+              </div>
+
+              <div class="col-stack">
+                <div class="slider-label-row">
+                  <span>Âm lượng</span>
+                  <span id="valSoundVol">60%</span>
+                </div>
+                <input type="range" id="rangeSoundVol" min="5" max="100" value="60" />
+              </div>
+            </div>
+
+            <!-- Offline Guide & Standalone Download -->
+            <div class="setting-card" style="background-color:#ecfdf5; border-color:#a7f3d0;">
+              <div class="group-label" style="color:#065f46;">Hướng dẫn chạy Offline 100% trên iPhone</div>
+              <p style="font-size: 12px; color: #047857; line-height: 1.55;">
+                1. Bật Wi-Fi/4G và mở link GitHub Pages bằng <b>Safari</b>.<br/>
+                2. Bấm nút <b>Chia sẻ (Share)</b> → chọn <b>Thêm vào MH chính (Add to Home Screen)</b>.<br/>
+                3. Mở biểu tượng trên màn hình chính <b>1 lần khi có mạng</b> để iPhone lưu bộ nhớ đệm. Từ lần sau bật Chế độ Máy bay vẫn dùng mượt 100%.
+              </p>
+              <button id="downloadOfflineHtmlBtn" class="chip-btn" style="width:100%; padding:10px; background-color:#059669; color:#ffffff; border-color:#059669;">
+                ⬇ Tải tệp index.html hoàn chỉnh về máy
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* =====================================================================
+         1. STORAGE KEYS (calc_pro_v2_*) & DEFAULTS
+      ===================================================================== */
+      const STORAGE_KEY_SETTINGS = 'calc_pro_v2_settings';
+      const STORAGE_KEY_HISTORY  = 'calc_pro_v2_history';
+
+      const TITLE_ICONS = [
+        { id: 'none', svg: '' },
+        { id: 'calc', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18.01"/></svg>' },
+        { id: 'bolt', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>' },
+        { id: 'star', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>' },
+        { id: 'diamond', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12l4 6-10 12L2 9l4-6z"/></svg>' },
+        { id: 'chart', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>' },
+        { id: 'wallet', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>' },
+        { id: 'heart', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>' },
+        { id: 'sparkles', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>' },
+        { id: 'crown', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 18h18M5 15l-2-9 5 4 4-6 4 6 5-4-2 9H5z"/></svg>' },
+        { id: 'shield', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>' },
+        { id: 'globe', svg: '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>' }
+      ];
+
+      const PRESETS = {
+        purple: {
+          '--header-bg': '#9c4dcc',
+          '--header-text': '#ffffff',
+          '--display-bg': '#ffffff',
+          '--display-text': '#111827',
+          '--display-subtext': '#6b7280',
+          '--accent-color': '#8e24aa',
+          '--keypad-bg': '#f3f4f6',
+          '--num-btn-bg': '#ffffff',
+          '--num-btn-text': '#111827',
+          '--op-btn-bg': '#ffffff',
+          '--op-btn-text': '#8e24aa',
+          '--eq-btn-bg': '#7b1fa2',
+          '--eq-btn-text': '#ffffff'
+        },
+        ocean: {
+          '--header-bg': '#0284c7',
+          '--header-text': '#ffffff',
+          '--display-bg': '#f0f9ff',
+          '--display-text': '#0c4a6e',
+          '--display-subtext': '#0369a1',
+          '--accent-color': '#0284c7',
+          '--keypad-bg': '#e0f2fe',
+          '--num-btn-bg': '#ffffff',
+          '--num-btn-text': '#0f172a',
+          '--op-btn-bg': '#f8fafc',
+          '--op-btn-text': '#0284c7',
+          '--eq-btn-bg': '#0369a1',
+          '--eq-btn-text': '#ffffff'
+        },
+        sakura: {
+          '--header-bg': '#ec4899',
+          '--header-text': '#ffffff',
+          '--display-bg': '#fff1f2',
+          '--display-text': '#881337',
+          '--display-subtext': '#be185d',
+          '--accent-color': '#db2777',
+          '--keypad-bg': '#fce7f3',
+          '--num-btn-bg': '#ffffff',
+          '--num-btn-text': '#4c0519',
+          '--op-btn-bg': '#fff5f7',
+          '--op-btn-text': '#db2777',
+          '--eq-btn-bg': '#be185d',
+          '--eq-btn-text': '#ffffff'
+        },
+        dark: {
+          '--header-bg': '#1f2937',
+          '--header-text': '#f9fafb',
+          '--display-bg': '#111827',
+          '--display-text': '#f9fafb',
+          '--display-subtext': '#9ca3af',
+          '--accent-color': '#c084fc',
+          '--keypad-bg': '#030712',
+          '--num-btn-bg': '#1f2937',
+          '--num-btn-text': '#f9fafb',
+          '--op-btn-bg': '#1f2937',
+          '--op-btn-text': '#c084fc',
+          '--eq-btn-bg': '#9333ea',
+          '--eq-btn-text': '#ffffff'
+        }
+      };
+
+      const DEFAULT_SETTINGS = {
+        colors: { ...PRESETS.purple },
+        themeSync: {
+          autoThemeSync: true,
+          syncMode: 'system',
+          manualDark: false
+        },
+        title: {
+          text: 'Máy tính Pro',
+          iconId: 'calc',
+          color: '#ffffff'
+        },
+        voice: {
+          enabled: true,
+          mode: 'result',
+          rate: 100,
+          pitch: 100
+        },
+        wallpaper: {
+          imageData: '',
+          opacity: 100,
+          overlay: 0,
+          scale: 100,
+          posX: 50,
+          posY: 50
+        },
+        sizes: {
+          btnHeight: 56,
+          btnGap: 8,
+          btnRadius: 12,
+          btnFontSize: 24,
+          displayFontSize: 46
+        },
+        sound: {
+          enabled: true,
+          type: 'pop',
+          volume: 60
+        }
+      };
+
+      let settings = loadSettings();
+      let historyItems = loadHistory();
+
+      let expression = '';
+      let isDegree = true;
+      let justEvaluated = false;
+
+      function loadSettings() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_SETTINGS);
+          if (!raw) return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+          const parsed = JSON.parse(raw);
+          return {
+            colors: { ...DEFAULT_SETTINGS.colors, ...(parsed.colors || {}) },
+            themeSync: { ...DEFAULT_SETTINGS.themeSync, ...(parsed.themeSync || {}) },
+            title: { ...DEFAULT_SETTINGS.title, ...(parsed.title || {}) },
+            voice: { ...DEFAULT_SETTINGS.voice, ...(parsed.voice || {}) },
+            wallpaper: { ...DEFAULT_SETTINGS.wallpaper, ...(parsed.wallpaper || {}) },
+            sizes: { ...DEFAULT_SETTINGS.sizes, ...(parsed.sizes || {}) },
+            sound: { ...DEFAULT_SETTINGS.sound, ...(parsed.sound || {}) }
+          };
+        } catch (e) {
+          return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+        }
+      }
+
+      function saveSettings() {
+        try {
+          localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+        } catch (e) {
+          showToast('Dung lượng ảnh quá lớn, vui lòng chọn ảnh khác!');
+        }
+      }
+
+      function loadHistory() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_HISTORY);
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveHistory() {
+        try {
+          localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(historyItems.slice(0, 100)));
+        } catch (e) {}
+      }
+
+      /* =====================================================================
+         2. VIETNAMESE SPEECH SYNTHESIS ENGINE
+      ===================================================================== */
+      let cachedViVoice = null;
+
+      function findVietnameseVoice() {
+        if (!('speechSynthesis' in window)) return null;
+        const voices = window.speechSynthesis.getVoices();
+        cachedViVoice = voices.find(v => v.lang && v.lang.toLowerCase().includes('vi')) || null;
+        return cachedViVoice;
+      }
+
+      if ('speechSynthesis' in window) {
+        findVietnameseVoice();
+        window.speechSynthesis.onvoiceschanged = findVietnameseVoice;
+      }
+
+      function speakVietnamese(text) {
+        if (!settings.voice.enabled || !text) return;
+        if (!('speechSynthesis' in window)) return;
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          const v = cachedViVoice || findVietnameseVoice();
+          if (v) utter.voice = v;
+          utter.lang = 'vi-VN';
+          utter.rate = settings.voice.rate / 100;
+          utter.pitch = settings.voice.pitch / 100;
+          window.speechSynthesis.speak(utter);
+        } catch (e) {}
+      }
+
+      function numberToVietnameseWords(num) {
+        if (!isFinite(num) || isNaN(num)) return 'lỗi phép tính';
+        if (num === 0) return 'không';
+
+        let prefix = '';
+        if (num < 0) {
+          prefix = 'âm ';
+          num = Math.abs(num);
+        }
+
+        const rounded = Math.round(num * 1e9) / 1e9;
+        const parts = rounded.toString().split('.');
+        const intStr = parts[0];
+        const decStr = parts[1] || '';
+
+        const intWords = readIntegerGroupVietnamese(intStr);
+        if (!decStr) return prefix + intWords;
+
+        const digitNames = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+        const decWords = decStr.split('').map(d => digitNames[Number(d)]).join(' ');
+        return prefix + intWords + ' phẩy ' + decWords;
+      }
+
+      function readIntegerGroupVietnamese(numStr) {
+        if (numStr === '0') return 'không';
+        const digitNames = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+        if (numStr.length > 15) {
+          return numStr.split('').map(d => digitNames[Number(d)]).join(' ');
+        }
+
+        const units = ['', 'nghìn', 'triệu', 'tỷ', 'nghìn tỷ'];
+
+        function readThree(threeStr, showZeroHundred) {
+          const n = parseInt(threeStr, 10);
+          if (n === 0) return '';
+          const h = Math.floor(n / 100);
+          const t = Math.floor((n % 100) / 10);
+          const u = n % 10;
+          let out = '';
+
+          if (h > 0 || showZeroHundred) {
+            out += digitNames[h] + ' trăm ';
+          }
+          if (t === 0 && u > 0 && (h > 0 || showZeroHundred)) {
+            out += 'lẻ ';
+          } else if (t === 1) {
+            out += 'mười ';
+          } else if (t > 1) {
+            out += digitNames[t] + ' mươi ';
+          }
+
+          if (u > 0) {
+            if (u === 1 && t > 1) out += 'mốt';
+            else if (u === 5 && t >= 1) out += 'lăm';
+            else if (u === 4 && t > 1) out += 'tư';
+            else out += digitNames[u];
+          }
+          return out.trim();
+        }
+
+        const groups = [];
+        let s = numStr;
+        while (s.length > 0) {
+          groups.unshift(s.slice(-3));
+          s = s.slice(0, -3);
+        }
+
+        const chunks = [];
+        for (let i = 0; i < groups.length; i++) {
+          const unitIdx = groups.length - 1 - i;
+          const chunk = readThree(groups[i], i > 0);
+          if (chunk) {
+            chunks.push(chunk + (units[unitIdx] ? ' ' + units[unitIdx] : ''));
+          }
+        }
+        return chunks.join(' ').replace(/\s+/g, ' ').trim();
+      }
+
+      const KEY_SPEECH_MAP = {
+        '0': 'không', '00': 'không không', '1': 'một', '2': 'hai', '3': 'ba',
+        '4': 'bốn', '5': 'năm', '6': 'sáu', '7': 'bảy', '8': 'tám', '9': 'chín',
+        ',': 'phẩy', '+': 'cộng', '−': 'trừ', '×': 'nhân', '÷': 'chia',
+        '%': 'phần trăm', 'C': 'xóa', '()': 'ngoặc',
+        'sin(': 'sin', 'cos(': 'cos', 'tan(': 'tan', 'asin(': 'arc sin', 'acos(': 'arc cos',
+        'ln(': 'lô ga rít tự nhiên', 'log(': 'lô ga rít', '√(': 'căn bậc hai',
+        '^': 'mũ', 'π': 'pi', 'e': 'e', '!': 'giai thừa', '1/(': 'một phần', 'abs(': 'giá trị tuyệt đối'
+      };
+
+      /* =====================================================================
+         3. WEB AUDIO API SYNTHESIZER (100% OFFLINE KEYPRESS SOUNDS)
+      ===================================================================== */
+      let audioCtx = null;
+
+      function playKeySound(isSpecial = false) {
+        if (!settings.sound.enabled) return;
+        try {
+          if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+          }
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+          }
+
+          const vol = (settings.sound.volume / 100) * 0.35;
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          const type = settings.sound.type;
+          if (type === 'pop') {
+            osc.type = 'sine';
+            const baseFreq = isSpecial ? 520 : 660;
+            osc.frequency.setValueAtTime(baseFreq, now);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.45, now + 0.045);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.055);
+          } else if (type === 'mech') {
+            osc.type = 'triangle';
+            const baseFreq = isSpecial ? 280 : 380;
+            osc.frequency.setValueAtTime(baseFreq, now);
+            osc.frequency.exponentialRampToValueAtTime(90, now + 0.03);
+            gain.gain.setValueAtTime(vol * 1.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+            osc.start(now);
+            osc.stop(now + 0.04);
+          } else if (type === 'beep') {
+            osc.type = 'square';
+            const baseFreq = isSpecial ? 880 : 1046.5;
+            osc.frequency.setValueAtTime(baseFreq, now);
+            gain.gain.setValueAtTime(vol * 0.4, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+            osc.start(now);
+            osc.stop(now + 0.05);
+          } else if (type === 'marimba') {
+            osc.type = 'sine';
+            const notes = [523.25, 587.33, 659.25, 783.99, 880.0];
+            const note = isSpecial ? 440 : notes[Math.floor(Math.random() * notes.length)];
+            osc.frequency.setValueAtTime(note, now);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+            osc.start(now);
+            osc.stop(now + 0.15);
+          }
+        } catch (e) {}
+      }
+
+      /* =====================================================================
+         4. LIGHT / DARK THEME SYNC & APPLY SETTINGS TO DOM
+      ===================================================================== */
+      const rootStyle = document.documentElement.style;
+      const systemDarkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+      function isDarkModeActive() {
+        if (settings.themeSync.autoThemeSync) {
+          if (settings.themeSync.syncMode === 'system') {
+            return systemDarkQuery ? systemDarkQuery.matches : false;
+          }
+          if (settings.themeSync.syncMode === 'schedule') {
+            const h = new Date().getHours();
+            return h >= 18 || h < 6;
+          }
+        }
+        return !!settings.themeSync.manualDark;
+      }
+
+      function applySettingsToUI() {
+        const darkActive = isDarkModeActive();
+        const activeColors = { ...settings.colors };
+
+        if (darkActive) {
+          activeColors['--display-bg'] = '#111827';
+          activeColors['--display-text'] = '#f9fafb';
+          activeColors['--display-subtext'] = '#9ca3af';
+          activeColors['--keypad-bg'] = '#030712';
+          activeColors['--num-btn-bg'] = '#1f2937';
+          activeColors['--num-btn-text'] = '#f9fafb';
+          activeColors['--op-btn-bg'] = '#1f2937';
+          activeColors['--op-btn-text'] = '#c084fc';
+        }
+
+        for (const [varName, val] of Object.entries(activeColors)) {
+          rootStyle.setProperty(varName, val);
+        }
+        rootStyle.setProperty('--accent-color', activeColors['--op-btn-text']);
+        rootStyle.setProperty('--header-title-color', settings.title.color);
+        document.getElementById('metaThemeColor').setAttribute('content', activeColors['--header-bg']);
+
+        const themeIcon = document.getElementById('quickThemeIcon');
+        if (darkActive) {
+          themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />';
+        } else {
+          themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />';
+        }
+
+        document.getElementById('autoThemeSyncToggle').checked = settings.themeSync.autoThemeSync;
+        document.getElementById('themeSyncModeSelect').value = settings.themeSync.syncMode;
+        document.getElementById('syncModeContainer').style.opacity = settings.themeSync.autoThemeSync ? '1' : '0.45';
+        document.getElementById('themeSyncModeSelect').disabled = !settings.themeSync.autoThemeSync;
+
+        const titleTextEl = document.getElementById('headerTitleText');
+        titleTextEl.textContent = settings.title.text;
+        titleTextEl.style.display = settings.title.text.trim() ? 'inline' : 'none';
+
+        const iconObj = TITLE_ICONS.find(i => i.id === settings.title.iconId);
+        const titleIconEl = document.getElementById('headerTitleIcon');
+        titleIconEl.innerHTML = iconObj ? iconObj.svg : '';
+        titleIconEl.style.display = (iconObj && iconObj.svg) ? 'inline-flex' : 'none';
+
+        document.getElementById('titleTextInput').value = settings.title.text;
+        document.getElementById('titleColorInput').value = settings.title.color;
+        renderTitleIconPicker();
+
+        document.querySelectorAll('input[type="color"][data-var]').forEach(inp => {
+          const v = inp.getAttribute('data-var');
+          if (settings.colors[v]) inp.value = settings.colors[v];
+        });
+
+        const voiceBtn = document.getElementById('quickVoiceToggleBtn');
+        const voiceIcon = document.getElementById('quickVoiceIcon');
+        voiceBtn.classList.toggle('is-active', settings.voice.enabled);
+        if (settings.voice.enabled) {
+          voiceIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />';
+        } else {
+          voiceIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />';
+        }
+
+        document.getElementById('voiceEnabledToggle').checked = settings.voice.enabled;
+        document.getElementById('voiceModeSelect').value = settings.voice.mode;
+        document.getElementById('rangeVoiceRate').value = settings.voice.rate;
+        document.getElementById('valVoiceRate').textContent = (settings.voice.rate / 100).toFixed(1) + 'x';
+        document.getElementById('rangeVoicePitch').value = settings.voice.pitch;
+        document.getElementById('valVoicePitch').textContent = (settings.voice.pitch / 100).toFixed(1);
+
+        const bgDiv = document.getElementById('displayBgImage');
+        bgDiv.style.backgroundImage = settings.wallpaper.imageData ? `url("${settings.wallpaper.imageData}")` : 'none';
+        rootStyle.setProperty('--bg-opacity', settings.wallpaper.opacity / 100);
+        rootStyle.setProperty('--bg-overlay-alpha', settings.wallpaper.overlay / 100);
+        rootStyle.setProperty('--bg-scale', settings.wallpaper.scale + '%');
+        rootStyle.setProperty('--bg-pos-x', settings.wallpaper.posX + '%');
+        rootStyle.setProperty('--bg-pos-y', settings.wallpaper.posY + '%');
+
+        document.getElementById('rangeBgOpacity').value = settings.wallpaper.opacity;
+        document.getElementById('valBgOpacity').textContent = settings.wallpaper.opacity + '%';
+        document.getElementById('rangeBgOverlay').value = settings.wallpaper.overlay;
+        document.getElementById('valBgOverlay').textContent = settings.wallpaper.overlay + '%';
+        document.getElementById('rangeBgScale').value = settings.wallpaper.scale;
+        document.getElementById('valBgScale').textContent = settings.wallpaper.scale + '%';
+        document.getElementById('rangeBgPosX').value = settings.wallpaper.posX;
+        document.getElementById('valBgPosX').textContent = settings.wallpaper.posX + '%';
+        document.getElementById('rangeBgPosY').value = settings.wallpaper.posY;
+        document.getElementById('valBgPosY').textContent = settings.wallpaper.posY + '%';
+
+        rootStyle.setProperty('--btn-scale-h', settings.sizes.btnHeight + 'px');
+        rootStyle.setProperty('--btn-gap', settings.sizes.btnGap + 'px');
+        rootStyle.setProperty('--btn-radius', settings.sizes.btnRadius + 'px');
+        rootStyle.setProperty('--btn-font-size', settings.sizes.btnFontSize + 'px');
+        rootStyle.setProperty('--display-font-size', settings.sizes.displayFontSize + 'px');
+
+        document.getElementById('rangeBtnHeight').value = settings.sizes.btnHeight;
+        document.getElementById('valBtnHeight').textContent = settings.sizes.btnHeight + 'px';
+        document.getElementById('rangeBtnGap').value = settings.sizes.btnGap;
+        document.getElementById('valBtnGap').textContent = settings.sizes.btnGap + 'px';
+        document.getElementById('rangeBtnRadius').value = settings.sizes.btnRadius;
+        document.getElementById('valBtnRadius').textContent = settings.sizes.btnRadius + 'px';
+        document.getElementById('rangeBtnFontSize').value = settings.sizes.btnFontSize;
+        document.getElementById('valBtnFontSize').textContent = settings.sizes.btnFontSize + 'px';
+        document.getElementById('rangeDisplayFontSize').value = settings.sizes.displayFontSize;
+        document.getElementById('valDisplayFontSize').textContent = settings.sizes.displayFontSize + 'px';
+
+        document.getElementById('soundToggle').checked = settings.sound.enabled;
+        document.getElementById('soundTypeSelect').value = settings.sound.type;
+        document.getElementById('rangeSoundVol').value = settings.sound.volume;
+        document.getElementById('valSoundVol').textContent = settings.sound.volume + '%';
+      }
+
+      if (systemDarkQuery) {
+        systemDarkQuery.addEventListener('change', () => {
+          if (settings.themeSync.autoThemeSync && settings.themeSync.syncMode === 'system') {
+            applySettingsToUI();
+          }
+        });
+      }
+
+      setInterval(() => {
+        if (settings.themeSync.autoThemeSync && settings.themeSync.syncMode === 'schedule') {
+          applySettingsToUI();
+        }
+      }, 60000);
+
+      /* =====================================================================
+         5. CALCULATOR ENGINE (LEADING ZEROS + SMART PERCENTAGE FIXED)
+      ===================================================================== */
+      const expressionEl = document.getElementById('expressionText');
+      const resultEl = document.getElementById('resultText');
+
+      function formatVietnameseNumber(num) {
+        if (!isFinite(num) || isNaN(num)) return 'Lỗi phép tính';
+        const rounded = Math.round(num * 1e12) / 1e12;
+        const parts = rounded.toString().split('.');
+        const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return parts.length > 1 ? intPart + ',' + parts[1] : intPart;
+      }
+
+      function adjustResultFontScale(text) {
+        const base = settings.sizes.displayFontSize;
+        const len = text.length;
+        if (len > 16) rootStyle.setProperty('--display-font-size', Math.max(24, Math.round(base * 0.62)) + 'px');
+        else if (len > 12) rootStyle.setProperty('--display-font-size', Math.max(28, Math.round(base * 0.78)) + 'px');
+        else rootStyle.setProperty('--display-font-size', base + 'px');
+      }
+
+      function factorial(n) {
+        if (n < 0 || !Number.isInteger(n)) return NaN;
+        if (n > 170) return Infinity;
+        let res = 1;
+        for (let i = 2; i <= n; i++) res *= i;
+        return res;
+      }
+
+      function evaluateExpression(rawExpr) {
+        if (!rawExpr || !rawExpr.trim()) return null;
+
+        let expr = rawExpr
+          .replace(/×/g, '*')
+          .replace(/÷/g, '/')
+          .replace(/−/g, '-')
+          .replace(/,/g, '.')
+          .replace(/π/g, 'Math.PI')
+          .replace(/\be\b/g, 'Math.E')
+          .replace(/√\(/g, 'Math.sqrt(')
+          .replace(/ln\(/g, 'Math.log(')
+          .replace(/log\(/g, 'Math.log10(')
+          .replace(/abs\(/g, 'Math.abs(')
+          .replace(/\^/g, '**');
+
+        // Normalize leading zeros so 007 -> 7, 05 + 03 -> 5 + 3, while keeping 0.5 intact
+        expr = expr.replace(/(^|[^0-9.])0+(?=[0-9])/g, '$1');
+
+        // Smart Percentage Logic:
+        // 1) Additive/Subtractive: A + B% -> A + (A * (B / 100))
+        expr = expr.replace(/(\d+(?:\.\d+)?)\s*([\+\-])\s*(\d+(?:\.\d+)?)%/g, '($1 $2 ($1 * ($3 / 100)))');
+        // 2) Standalone or Multiplicative/Divisive: B% -> (B / 100)
+        expr = expr.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
+
+        // Factorials
+        expr = expr.replace(/(\d+)!/g, 'factorial($1)');
+
+        // Implicit multiplication
+        expr = expr
+          .replace(/(\d)(\()/g, '$1*$2')
+          .replace(/(\))(\d)/g, '$1*$2')
+          .replace(/(\))(\()/g, '$1*$2')
+          .replace(/(\d)(Math\.)/g, '$1*$2')
+          .replace(/(\d)(sin|cos|tan|asin|acos)/g, '$1*$2');
+
+        // Auto-close unmatched open parentheses
+        const openCount = (expr.match(/\(/g) || []).length;
+        const closeCount = (expr.match(/\)/g) || []).length;
+        if (openCount > closeCount) {
+          expr += ')'.repeat(openCount - closeCount);
+        }
+
+        // Strip trailing incomplete operators
+        expr = expr.replace(/[\+\-\*\/\.]+$/, '');
+        if (!expr) return null;
+
+        const degToRad = isDegree ? (Math.PI / 180) : 1;
+        const radToDeg = isDegree ? (180 / Math.PI) : 1;
+
+        const scope = {
+          Math,
+          factorial,
+          sin: (x) => Math.sin(x * degToRad),
+          cos: (x) => Math.cos(x * degToRad),
+          tan: (x) => Math.tan(x * degToRad),
+          asin: (x) => Math.asin(x) * radToDeg,
+          acos: (x) => Math.acos(x) * radToDeg
+        };
+
+        try {
+          const fn = new Function(...Object.keys(scope), `"use strict"; return (${expr});`);
+          const val = fn(...Object.values(scope));
+          return (typeof val === 'number' && !isNaN(val)) ? val : null;
+        } catch (err) {
+          return null;
+        }
+      }
+
+      function updateDisplay() {
+        if (!expression) {
+          expressionEl.textContent = '';
+          resultEl.textContent = '0';
+          adjustResultFontScale('0');
+          return;
+        }
+
+        expressionEl.textContent = expression;
+        expressionEl.scrollLeft = expressionEl.scrollWidth;
+
+        const val = evaluateExpression(expression);
+        if (val !== null) {
+          const formatted = formatVietnameseNumber(val);
+          resultEl.textContent = formatted;
+          adjustResultFontScale(formatted);
+        }
+        resultEl.scrollLeft = resultEl.scrollWidth;
+      }
+
+      function handleKeyInput(key) {
+        const isOperator = ['+', '−', '×', '÷', '%', '^'].includes(key);
+        playKeySound(isOperator || key === 'C' || key === '=');
+
+        if (key === 'C') {
+          expression = '';
+          justEvaluated = false;
+          expressionEl.textContent = '';
+          resultEl.textContent = '0';
+          adjustResultFontScale('0');
+          if (settings.voice.mode === 'all') speakVietnamese('xóa');
+          return;
+        }
+
+        if (key === '=') {
+          if (!expression) return;
+          const val = evaluateExpression(expression);
+          if (val !== null && isFinite(val)) {
+            const formattedRes = formatVietnameseNumber(val);
+            historyItems.unshift({
+              id: Date.now(),
+              expr: expression,
+              result: formattedRes,
+              rawResult: val.toString().replace('.', ','),
+              time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+            });
+            saveHistory();
+
+            expressionEl.textContent = expression + ' =';
+            resultEl.textContent = formattedRes;
+            adjustResultFontScale(formattedRes);
+            expression = val.toString().replace('.', ',');
+            justEvaluated = true;
+
+            speakVietnamese(numberToVietnameseWords(val));
+          } else {
+            resultEl.textContent = 'Lỗi phép tính';
+            speakVietnamese('lỗi phép tính');
+          }
+          return;
+        }
+
+        if (settings.voice.mode === 'all' && KEY_SPEECH_MAP[key]) {
+          speakVietnamese(KEY_SPEECH_MAP[key]);
+        }
+
+        if (key === '()') {
+          if (justEvaluated) {
+            expression = '';
+            justEvaluated = false;
+          }
+          const openCount = (expression.match(/\(/g) || []).length;
+          const closeCount = (expression.match(/\)/g) || []).length;
+          const lastChar = expression.slice(-1);
+          if (openCount > closeCount && (/\d|\)|π|e|%/.test(lastChar))) {
+            expression += ')';
+          } else {
+            expression += '(';
+          }
+          updateDisplay();
+          return;
+        }
+
+        if (justEvaluated) {
+          if (isOperator) {
+            justEvaluated = false;
+          } else {
+            expression = '';
+            justEvaluated = false;
+          }
+        }
+
+        const lastChar = expression.slice(-1);
+        if (isOperator && ['+', '−', '×', '÷', '^'].includes(lastChar)) {
+          expression = expression.slice(0, -1) + key;
+          updateDisplay();
+          return;
+        }
+
+        // Prevent redundant leading zeros in current number segment (e.g., 00 -> 0, 05 -> 5)
+        if (/^[0-9]$/.test(key) || key === '00') {
+          const segments = expression.split(/[\+\−\×\÷\(\)\^%]/);
+          const currentNum = segments[segments.length - 1];
+          if (currentNum === '0') {
+            if (key === '0' || key === '00') return;
+            expression = expression.slice(0, -1) + key;
+            updateDisplay();
+            return;
+          }
+          if (currentNum === '' && key === '00') {
+            expression += '0';
+            updateDisplay();
+            return;
+          }
+        }
+
+        if (key === ',') {
+          const segments = expression.split(/[\+\−\×\÷\(\)\^%]/);
+          const currentNum = segments[segments.length - 1];
+          if (currentNum.includes(',')) return;
+          if (currentNum === '') expression += '0';
+        }
+
+        expression += key;
+        updateDisplay();
+      }
+
+      function handleBackspace() {
+        playKeySound(true);
+        if (justEvaluated) justEvaluated = false;
+        if (!expression) return;
+
+        const sciTokens = ['asin(', 'acos(', 'sin(', 'cos(', 'tan(', 'log(', 'abs(', 'ln(', '√(', '1/('];
+        for (const token of sciTokens) {
+          if (expression.endsWith(token)) {
+            expression = expression.slice(0, -token.length);
+            updateDisplay();
+            return;
+          }
+        }
+
+        expression = expression.slice(0, -1);
+        updateDisplay();
+      }
+
+      /* =====================================================================
+         6. EVENT LISTENERS FOR KEYPAD, HEADER & KEYBOARD
+      ===================================================================== */
+      document.querySelectorAll('#keypadArea .calc-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleKeyInput(btn.getAttribute('data-key')));
+      });
+
+      document.querySelectorAll('#scientificPanel .sci-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.getAttribute('data-action') === 'degRad') {
+            playKeySound(true);
+            isDegree = !isDegree;
+            btn.textContent = isDegree ? 'DEG' : 'RAD';
+            document.getElementById('degRadIndicator').textContent = isDegree ? 'DEG' : 'RAD';
+            updateDisplay();
+            return;
+          }
+          const sciToken = btn.getAttribute('data-sci');
+          if (sciToken) handleKeyInput(sciToken);
+        });
+      });
+
+      document.getElementById('backspaceBtn').addEventListener('click', handleBackspace);
+
+      const sciPanel = document.getElementById('scientificPanel');
+      const sciChevron = document.getElementById('sciChevronIcon');
+      const degRadBadge = document.getElementById('degRadIndicator');
+
+      document.getElementById('toggleSciBtn').addEventListener('click', () => {
+        playKeySound(true);
+        const isOpen = sciPanel.classList.toggle('open');
+        sciChevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        degRadBadge.classList.toggle('visible', isOpen);
+      });
+
+      document.getElementById('quickThemeToggleBtn').addEventListener('click', () => {
+        playKeySound();
+        const currentlyDark = isDarkModeActive();
+        settings.themeSync.autoThemeSync = false;
+        settings.themeSync.manualDark = !currentlyDark;
+        applySettingsToUI();
+        saveSettings();
+        showToast(!currentlyDark ? 'Đã chuyển giao diện Tối' : 'Đã chuyển giao diện Sáng');
+      });
+
+      document.getElementById('quickVoiceToggleBtn').addEventListener('click', () => {
+        playKeySound();
+        settings.voice.enabled = !settings.voice.enabled;
+        applySettingsToUI();
+        saveSettings();
+        showToast(settings.voice.enabled ? 'Đã bật đọc giọng nói' : 'Đã tắt đọc giọng nói');
+        if (settings.voice.enabled) speakVietnamese('Đã bật đọc giọng nói');
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (!document.getElementById('settingsModal').classList.contains('hidden')) return;
+        if (!document.getElementById('historyModal').classList.contains('hidden')) return;
+
+        const k = e.key;
+        if (/^[0-9]$/.test(k)) handleKeyInput(k);
+        else if (k === '+') handleKeyInput('+');
+        else if (k === '-') handleKeyInput('−');
+        else if (k === '*') handleKeyInput('×');
+        else if (k === '/') { e.preventDefault(); handleKeyInput('÷'); }
+        else if (k === '%') handleKeyInput('%');
+        else if (k === ',' || k === '.') handleKeyInput(',');
+        else if (k === '(' || k === ')') handleKeyInput(k);
+        else if (k === 'Enter' || k === '=') { e.preventDefault(); handleKeyInput('='); }
+        else if (k === 'Backspace') handleBackspace();
+        else if (k === 'Escape' || k === 'Delete' || k === 'c' || k === 'C') handleKeyInput('C');
+      });
+
+      /* =====================================================================
+         7. HISTORY MODAL LOGIC
+      ===================================================================== */
+      const historyModal = document.getElementById('historyModal');
+      const historyListEl = document.getElementById('historyList');
+
+      function renderHistory() {
+        if (!historyItems.length) {
+          historyListEl.innerHTML = `
+            <div style="text-align:center; color:#9ca3af; padding:48px 0; font-size:13px;">
+              Chưa có lịch sử tính toán nào
+            </div>
+          `;
+          return;
+        }
+
+        historyListEl.innerHTML = historyItems.map((item, idx) => `
+          <div class="hist-item-card" data-hist-idx="${idx}">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#6b7280; margin-bottom:4px;">
+              <span>${item.time || ''}</span>
+              <span style="color:#7b1fa2; font-weight:600;">Chạm để dùng lại</span>
+            </div>
+            <div style="text-align:right; font-size:13px; color:#4b5563; word-break:break-all;">${item.expr}</div>
+            <div style="text-align:right; font-size:20px; font-weight:600; color:#111827; margin-top:2px;">= ${item.result}</div>
+          </div>
+        `).join('');
+
+        historyListEl.querySelectorAll('[data-hist-idx]').forEach(card => {
+          card.addEventListener('click', () => {
+            const idx = Number(card.getAttribute('data-hist-idx'));
+            const item = historyItems[idx];
+            if (item) {
+              playKeySound();
+              expression = item.rawResult || item.result.replace(/\./g, '');
+              justEvaluated = false;
+              updateDisplay();
+              historyModal.classList.add('hidden');
+              showToast('Đã chèn kết quả từ lịch sử');
+            }
+          });
+        });
+      }
+
+      document.getElementById('openHistoryBtn').addEventListener('click', () => {
+        playKeySound();
+        renderHistory();
+        historyModal.classList.remove('hidden');
+      });
+
+      document.getElementById('closeHistoryBtn').addEventListener('click', () => {
+        historyModal.classList.add('hidden');
+      });
+
+      historyModal.addEventListener('click', (e) => {
+        if (e.target === historyModal) historyModal.classList.add('hidden');
+      });
+
+      document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+        playKeySound(true);
+        historyItems = [];
+        saveHistory();
+        renderHistory();
+        showToast('Đã xóa toàn bộ lịch sử');
+      });
+
+      /* =====================================================================
+         8. SETTINGS MODAL LOGIC (WITH 900PX / 0.72 JPEG COMPRESSION FOR iOS)
+      ===================================================================== */
+      const settingsModal = document.getElementById('settingsModal');
+
+      function openSettings(defaultTab = 'tabColorsTitle') {
+        playKeySound();
+        switchSettingsTab(defaultTab);
+        settingsModal.classList.remove('hidden');
+      }
+
+      document.getElementById('openSettingsMenuBtn').addEventListener('click', () => openSettings('tabColorsTitle'));
+      document.getElementById('titleDisplayGroup').addEventListener('click', () => openSettings('tabColorsTitle'));
+      document.getElementById('displayDotsBtn').addEventListener('click', () => openSettings('tabWallpaper'));
+      document.getElementById('openQuickMoreBtn').addEventListener('click', () => openSettings('tabVoiceSound'));
+
+      document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+        settingsModal.classList.add('hidden');
+      });
+
+      settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) settingsModal.classList.add('hidden');
+      });
+
+      function switchSettingsTab(tabId) {
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+          tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
+        });
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.toggle('hidden', content.id !== tabId);
+        });
+      }
+
+      document.querySelectorAll('.settings-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          playKeySound();
+          switchSettingsTab(tab.getAttribute('data-tab'));
+        });
+      });
+
+      document.getElementById('autoThemeSyncToggle').addEventListener('change', (e) => {
+        settings.themeSync.autoThemeSync = e.target.checked;
+        applySettingsToUI();
+        saveSettings();
+      });
+
+      document.getElementById('themeSyncModeSelect').addEventListener('change', (e) => {
+        settings.themeSync.syncMode = e.target.value;
+        applySettingsToUI();
+        saveSettings();
+      });
+
+      document.getElementById('titleTextInput').addEventListener('input', (e) => {
+        settings.title.text = e.target.value;
+        applySettingsToUI();
+        saveSettings();
+      });
+
+      document.getElementById('titleColorInput').addEventListener('input', (e) => {
+        settings.title.color = e.target.value;
+        applySettingsToUI();
+        saveSettings();
+      });
+
+      function renderTitleIconPicker() {
+        const grid = document.getElementById('titleIconsGrid');
+        grid.innerHTML = TITLE_ICONS.map(ic => `
+          <button type="button" class="icon-choice-btn ${settings.title.iconId === ic.id ? 'selected' : ''}" data-icon-id="${ic.id}">
+            ${ic.svg || '<span style="font-size:11px;">Không</span>'}
+          </button>
+        `).join('');
+
+        grid.querySelectorAll('.icon-choice-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            playKeySound();
+            settings.title.iconId = btn.getAttribute('data-icon-id');
+            applySettingsToUI();
+            saveSettings();
+          });
+        });
+      }
+
+      document.querySelectorAll('input[type="color"][data-var]').forEach(inp => {
+        inp.addEventListener('input', (e) => {
+          const varName = e.target.getAttribute('data-var');
+          settings.colors[varName] = e.target.value;
+          settings.themeSync.autoThemeSync = false;
+          settings.themeSync.manualDark = false;
+          applySettingsToUI();
+          saveSettings();
+        });
+      });
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          playKeySound();
+          const presetKey = btn.getAttribute('data-preset');
+          if (PRESETS[presetKey]) {
+            settings.colors = { ...PRESETS[presetKey] };
+            settings.themeSync.autoThemeSync = false;
+            settings.themeSync.manualDark = (presetKey === 'dark');
+            applySettingsToUI();
+            saveSettings();
+            showToast('Đã áp dụng bộ màu');
+          }
+        });
+      });
+
+      // Wallpaper Upload with 900px max dimension & 0.72 JPEG quality for iOS Safari localStorage safety
+      document.getElementById('bgImageInput').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const img = new Image();
+          img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const maxDim = 900;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            settings.wallpaper.imageData = canvas.toDataURL('image/jpeg', 0.72);
+            applySettingsToUI();
+            saveSettings();
+            showToast('Đã lưu hình nền tối ưu bộ nhớ');
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById('removeBgImageBtn').addEventListener('click', () => {
+        playKeySound(true);
+        settings.wallpaper.imageData = '';
+        document.getElementById('bgImageInput').value = '';
+        applySettingsToUI();
+        saveSettings();
+        showToast('Đã xóa hình nền');
+      });
+
+      function bindSlider(id, targetObj, prop, callback) {
+        const el = document.getElementById(id);
+        el.addEventListener('input', (e) => {
+          targetObj[prop] = Number(e.target.value);
+          applySettingsToUI();
+          saveSettings();
+          if (callback) callback();
+        });
+      }
+
+      bindSlider('rangeBgOpacity', settings.wallpaper, 'opacity');
+      bindSlider('rangeBgOverlay', settings.wallpaper, 'overlay');
+      bindSlider('rangeBgScale', settings.wallpaper, 'scale');
+      bindSlider('rangeBgPosX', settings.wallpaper, 'posX');
+      bindSlider('rangeBgPosY', settings.wallpaper, 'posY');
+
+      bindSlider('rangeBtnHeight', settings.sizes, 'btnHeight');
+      bindSlider('rangeBtnGap', settings.sizes, 'btnGap');
+      bindSlider('rangeBtnRadius', settings.sizes, 'btnRadius');
+      bindSlider('rangeBtnFontSize', settings.sizes, 'btnFontSize');
+      bindSlider('rangeDisplayFontSize', settings.sizes, 'displayFontSize');
+
+      document.getElementById('voiceEnabledToggle').addEventListener('change', (e) => {
+        settings.voice.enabled = e.target.checked;
+        applySettingsToUI();
+        saveSettings();
+      });
+
+      document.getElementById('voiceModeSelect').addEventListener('change', (e) => {
+        settings.voice.mode = e.target.value;
+        saveSettings();
+      });
+
+      bindSlider('rangeVoiceRate', settings.voice, 'rate');
+      bindSlider('rangeVoicePitch', settings.voice, 'pitch');
+
+      document.getElementById('testVoiceBtn').addEventListener('click', () => {
+        const prev = settings.voice.enabled;
+        settings.voice.enabled = true;
+        speakVietnamese('Xin chào, máy tính sẵn sàng đọc kết quả bằng tiếng Việt');
+        settings.voice.enabled = prev;
+      });
+
+      document.getElementById('soundToggle').addEventListener('change', (e) => {
+        settings.sound.enabled = e.target.checked;
+        saveSettings();
+        if (settings.sound.enabled) playKeySound();
+      });
+
+      document.getElementById('soundTypeSelect').addEventListener('change', (e) => {
+        settings.sound.type = e.target.value;
+        saveSettings();
+        playKeySound();
+      });
+
+      bindSlider('rangeSoundVol', settings.sound, 'volume', () => playKeySound());
+
+      document.getElementById('resetAllBtn').addEventListener('click', () => {
+        playKeySound(true);
+        settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+        applySettingsToUI();
+        saveSettings();
+        showToast('Đã khôi phục cài đặt mặc định');
+      });
+
+      document.getElementById('downloadOfflineHtmlBtn').addEventListener('click', () => {
+        playKeySound();
+        const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Đang tải tệp index.html về máy...');
+      });
+
+      /* =====================================================================
+         9. TOAST HELPER & ZERO-DEPENDENCY OFFLINE PWA MANIFEST / SW
+      ===================================================================== */
+      let toastTimer = null;
+      function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2200);
+      }
+
+      function updateOnlineStatus() {
+        const badge = document.getElementById('offlineBadge');
+        badge.classList.toggle('visible', !navigator.onLine);
+      }
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      updateOnlineStatus();
+
+      try {
+        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#9c4dcc"/><rect x="34" y="28" width="124" height="44" rx="10" fill="#ffffff"/><text x="145" y="58" font-family="sans-serif" font-size="26" fill="#111827" text-anchor="end">0</text><rect x="34" y="86" width="56" height="34" rx="8" fill="#ffffff"/><rect x="102" y="86" width="56" height="34" rx="8" fill="#ffffff"/><rect x="34" y="130" width="56" height="34" rx="8" fill="#ffffff"/><rect x="102" y="130" width="56" height="34" rx="8" fill="#7b1fa2"/><text x="130" y="154" font-family="sans-serif" font-size="24" fill="#ffffff" text-anchor="middle">=</text></svg>`;
+        const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+        const manifest = {
+          name: 'Máy tính Pro V2 - Giọng nói & Offline',
+          short_name: 'Máy tính Pro',
+          start_url: '.',
+          display: 'standalone',
+          background_color: '#f3f4f6',
+          theme_color: '#9c4dcc',
+          icons: [{ src: iconUrl, sizes: '192x192', type: 'image/svg+xml' }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = URL.createObjectURL(manifestBlob);
+        document.head.appendChild(manifestLink);
+      } catch (e) {}
+
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        try {
+          const swCode = `
+            const CACHE_NAME = 'calc-pro-v2-offline-cache-v1';
+            self.addEventListener('install', (e) => {
+              e.waitUntil(
+                caches.open(CACHE_NAME).then((cache) => {
+                  const baseUrl = self.location.href.split('#')[0].split('?')[0];
+                  return cache.addAll([baseUrl]).catch(() => {});
+                })
+              );
+              self.skipWaiting();
+            });
+            self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+            self.addEventListener('fetch', (e) => {
+              if (e.request.method !== 'GET') return;
+              e.respondWith(
+                caches.match(e.request, { ignoreSearch: true }).then((cached) => {
+                  const networkFetch = fetch(e.request).then((resp) => {
+                    if (resp && resp.status === 200) {
+                      const copy = resp.clone();
+                      caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
+                    }
+                    return resp;
+                  }).catch(() => cached);
+                  return cached || networkFetch;
+                })
+              );
+            });
+          `;
+          const swBlob = new Blob([swCode], { type: 'application/javascript' });
+          navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+        } catch (e) {}
+      }
+
+      applySettingsToUI();
+    })();
+  </script>
+</body>
+</html>
